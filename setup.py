@@ -107,7 +107,7 @@ for x in range(1,4):
 		break
 
 try:
-	os.system("sudo cd //home/pi/adeept_rasptank/create_ap && sudo make install")
+	os.system("sudo cd //home/pi/adeept_raspclaws/create_ap && sudo make install")
 except:
 	pass
 
@@ -119,11 +119,11 @@ try:
 	os.system('sudo mkdir //home/pi/.config/autostart')
 	os.system('sudo touch //home/pi/.config/autostart/car.desktop')
 	with open("//home/pi/.config/autostart/car.desktop",'w') as file_to_write:
-		file_to_write.write("[Desktop Entry]\n   Name=Car\n   Comment=Car\n   Exec=sudo python3 //home/pi/adeept_rasptank/server/server.py\n   Icon=false\n   Terminal=false\n   MutipleArgs=false\n   Type=Application\n   Catagories=Application;Development;\n   StartupNotify=true")
+		file_to_write.write("[Desktop Entry]\n   Name=Car\n   Comment=Car\n   Exec=sudo python3 //home/pi/adeept_raspclaws/server/server.py\n   Icon=false\n   Terminal=false\n   MutipleArgs=false\n   Type=Application\n   Catagories=Application;Development;\n   StartupNotify=true")
 except:
 	pass
 
-os.system("sudo cp -f //home/pi/adeept_rasptank/server/config.txt //home/pi/config.txt")
+#os.system("sudo cp -f //home/pi/adeept_raspclaws/server/config.txt //home/pi/config.txt")
 
 print('restarting')
 
