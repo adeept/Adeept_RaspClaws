@@ -118,7 +118,7 @@ for x in range(1,4):
 		break
 
 try:
-	os.system("sudo cd //home/pi/adeept_darkpaw/create_ap && sudo make install")
+	os.system("sudo cd //home/pi/adeept_raspclaws/create_ap && sudo make install")
 except:
 	pass
 
