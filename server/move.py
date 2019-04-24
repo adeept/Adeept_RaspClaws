@@ -72,9 +72,14 @@ Y_pid.SetKd(I)
 Y_pid.SetKi(D)
 pwm = Adafruit_PCA9685.PCA9685()
 pwm.set_pwm_freq(50)
-sensor = mpu6050(0x68)
 kalman_filter_X =  Kalman_filter.Kalman_filter(0.001,0.1)
 kalman_filter_Y =  Kalman_filter.Kalman_filter(0.001,0.1)
+
+try:
+	sensor = mpu6050(0x68)
+	mpu6050_connection = 1
+except:
+	mpu6050_connection = 0
 
 '''
 change these two variable to adjuest the steady status.
@@ -105,6 +110,15 @@ def mpu6050Test():
 		print('X=%f,Y=%f,Z=%f'%(accelerometer_data['x'],accelerometer_data['y'],accelerometer_data['x']))
 		time.sleep(0.3)
 
+
+def ctrl_range(raw, max_genout, min_genout):
+	if raw > max_genout:
+		raw_output = max_genout
+	elif raw < min_genout:
+		raw_output = min_genout
+	else:
+		raw_output = raw
+	return int(raw_output)
 
 '''
 left_I   -<forward>-- right_III
@@ -875,93 +889,56 @@ def steady_X():
 
 def steady():
 	global X_fix_output, Y_fix_output
-	accelerometer_data = sensor.get_accel_data()
-	X = accelerometer_data['x']
-	X = kalman_filter_X.kalman(X)
-	Y = accelerometer_data['y']
-	Y = kalman_filter_Y.kalman(Y)
+	if mpu6050_connection:
+		accelerometer_data = sensor.get_accel_data()
+		X = accelerometer_data['x']
+		X = kalman_filter_X.kalman(X)
+		Y = accelerometer_data['y']
+		Y = kalman_filter_Y.kalman(Y)
 
-	if X_fix_output > steady_range_Max:
-		X_fix_output = steady_range_Max
-	elif X_fix_output < -steady_range_Max:
-		X_fix_output = -steady_range_Max
-	else:
 		X_fix_output += -X_pid.GenOut(X - target_X)
+		X_fix_output = ctrl_range(X_fix_output, steady_range_Max, -steady_range_Max)
 
-	if Y_fix_output > steady_range_Max:
-		Y_fix_output = steady_range_Max
-	elif Y_fix_output < -steady_range_Max:
-		Y_fix_output = -steady_range_Max
-	else:
 		Y_fix_output += -Y_pid.GenOut(Y - target_Y)
+		Y_fix_output = ctrl_range(Y_fix_output, steady_range_Max, -steady_range_Max)
 
-	'''
-	LEFT_I
-	'''
-	left_I_input = int(X_fix_output + Y_fix_output)
-	if left_I_input > steady_range_Max:
-		left_I_input = steady_range_Max
-	elif left_I_input < steady_range_Min:
-		left_I_input = steady_range_Min
-	#print(left_I_input)
-	left_I(0, 35, left_I_input)
+		'''
+		LEFT_I
+		'''	
+		left_I_input = ctrl_range((X_fix_output + Y_fix_output), steady_range_Max, steady_range_Min)
+		left_I(0, 35, left_I_input)
 
-	'''
-	LEFT_II
-	'''
-	#left_II_input = int(+Y_fix_output)
-	left_II_input = int(abs(X_fix_output*0.5)+Y_fix_output)
-	if left_II_input > steady_range_Max:
-		left_II_input = steady_range_Max
-	elif left_II_input < steady_range_Min:
-		left_II_input = steady_range_Min
-	#print(left_II_input)
-	left_II(0, 35, left_II_input)
+		'''
+		LEFT_II
+		'''
+		left_II_input = ctrl_range((abs(X_fix_output*0.5)+Y_fix_output), steady_range_Max, steady_range_Min)
+		left_II(0, 35, left_II_input)
 
-	'''
-	LEFT_III
-	'''
-	left_III_input = int(-X_fix_output + Y_fix_output)
-	if left_III_input > steady_range_Max:
-		left_III_input = steady_range_Max
-	elif left_III_input < steady_range_Min:
-		left_III_input = steady_range_Min
-	#print(left_III_input)
-	left_III(0, 35, left_III_input)
+		'''
+		LEFT_III
+		'''
+		left_III_input = ctrl_range((-X_fix_output + Y_fix_output), steady_range_Max, steady_range_Min)
+		left_III(0, 35, left_III_input)
 
-	'''
-	RIGHT_III
-	'''
-	right_III_input = int(X_fix_output - Y_fix_output)
-	if right_III_input > steady_range_Max:
-		right_III_input = steady_range_Max
-	elif right_III_input < steady_range_Min:
-		right_III_input = steady_range_Min
-	#print(right_III_input)
-	right_III(0, 35, right_III_input)
+		'''
+		RIGHT_III
+		'''
+		right_III_input = ctrl_range((X_fix_output - Y_fix_output), steady_range_Max, steady_range_Min)
+		right_III(0, 35, right_III_input)
 
-	'''
-	RIGHT_II
-	'''
-	#right_II_input = int(-Y_fix_output)
-	right_II_input = int(abs(-X_fix_output*0.5)-Y_fix_output)
-	if right_II_input > steady_range_Max:
-		right_II_input = steady_range_Max
-	elif right_II_input < steady_range_Min:
-		right_II_input = steady_range_Min
-	#print(right_II_input)
-	right_II(0, 35, right_II_input)
+		'''
+		RIGHT_II
+		'''
+		right_II_input = ctrl_range((abs(-X_fix_output*0.5)-Y_fix_output), steady_range_Max, steady_range_Min)
+		right_II(0, 35, right_II_input)
 
-	'''
-	RIGHT_I
-	'''
-	right_I_input = int(-X_fix_output-Y_fix_output)
-	if right_I_input > steady_range_Max:
-		right_I_input = steady_range_Max
-	elif right_I_input < steady_range_Min:
-		right_I_input = steady_range_Min
-	#print(right_III_input)
-	right_I(0, 35, right_I_input)
+		'''
+		RIGHT_I
+		'''
+		right_I_input = ctrl_range((-X_fix_output-Y_fix_output), steady_range_Max, steady_range_Min)
+		right_I(0, 35, right_I_input)
+	except:
+		pass
 
 
 def steadyTest():
@@ -1012,60 +989,44 @@ def steadyTest():
 def look_up(wiggle=look_wiggle):
 	global Up_Down_input
 	if Up_Down_direction:
-		if Up_Down_input < Up_Down_Max:
-			Up_Down_input += wiggle
-		else:
-			Up_Down_input = Up_Down_Max
+		Up_Down_input += wiggle
+		Up_Down_input = ctrl_range(Up_Down_input, Up_Down_Max, Up_Down_Min)
 	else:
-		if Up_Down_input > Up_Down_Min:
-			Up_Down_input -= wiggle
-		else:
-			Up_Down_input = Up_Down_Min
+		Up_Down_input -= wiggle
+		Up_Down_input = ctrl_range(Up_Down_input, Up_Down_Max, Up_Down_Min)
 	pwm.set_pwm(13, 0, Up_Down_input)
 
 
 def look_down(wiggle=look_wiggle):
 	global Up_Down_input
 	if Up_Down_direction:
-		if Up_Down_input > Up_Down_Min:
-			Up_Down_input -= wiggle
-		else:
-			Up_Down_input = Up_Down_Min
+		Up_Down_input -= wiggle
+		Up_Down_input = ctrl_range(Up_Down_input, Up_Down_Max, Up_Down_Min)
 	else:
-		if Up_Down_input < Up_Down_Max:
-			Up_Down_input += wiggle
-		else:
-			Up_Down_input = Up_Down_Max
+		Up_Down_input += wiggle
+		Up_Down_input = ctrl_range(Up_Down_input, Up_Down_Max, Up_Down_Min)
 	pwm.set_pwm(13, 0, Up_Down_input)
 
 
 def look_left(wiggle=look_wiggle):
 	global Left_Right_input
 	if Left_Right_direction:
-		if Left_Right_input < Left_Right_Max:
-			Left_Right_input += wiggle
-		else:
-			Left_Right_input = Left_Right_Max
+		Left_Right_input += wiggle
+		Left_Right_input = ctrl_range(Left_Right_input, Left_Right_Max, Left_Right_Min)
 	else:
-		if Left_Right_input > Left_Right_Min:
-			Left_Right_input -= wiggle
-		else:
-			Left_Right_input = Left_Right_Min
+		Left_Right_input -= wiggle
+		Left_Right_input = ctrl_range(Left_Right_input, Left_Right_Max, Left_Right_Min)
 	pwm.set_pwm(12, 0, Left_Right_input)
 
 
 def look_right(wiggle=look_wiggle):
 	global Left_Right_input
 	if Left_Right_direction:
-		if Left_Right_input > Left_Right_Min:
-			Left_Right_input -= wiggle
-		else:
-			Left_Right_input = Left_Right_Min
+		Left_Right_input -= wiggle
+		Left_Right_input = ctrl_range(Left_Right_input, Left_Right_Max, Left_Right_Min)
 	else:
-		if Left_Right_input < Left_Right_Max:
-			Left_Right_input += wiggle
-		else:
-			Left_Right_input = Left_Right_Max
+		Left_Right_input += wiggle
+		Left_Right_input = ctrl_range(Left_Right_input, Left_Right_Max, Left_Right_Min)
 	pwm.set_pwm(12, 0, Left_Right_input)
 
 
@@ -1089,26 +1050,9 @@ def destroy():
 	clean_all()
 
 
-step = 1
-move_stu = 1
 if __name__ == '__main__':
-	'''
-	for speed_I in range(0, (65+int(65/50)), int(65/50)):
-		if move_stu:
-			speed_II = speed_I
-			speed_I = 65 - speed_I
-			right_I(2, speed_I, 0)
-			left_II(2, speed_I, 0)
-			right_III(2, speed_I, 0)
-
-			left_I(4, speed_II, 0)
-			right_II(4, speed_II, 0)
-			left_III(4, speed_II, 0)
-			print(speed_I)
-			time.sleep(5/50)
-	pwm.set_all_pwm(0,300)
-	'''
-	
+	step = 1
+	move_stu = 1
 	try:
 		'''
 		while 1:
