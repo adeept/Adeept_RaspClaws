@@ -12,16 +12,29 @@ import Kalman_filter
 import PID
 
 '''
+change this variables to 0 to reverse all the servos.
+'''
+set_direction = 1
+
+'''
 change these two variables to reverse the direction of the legs.
 '''
-leftSide_direction  = 1
-rightSide_direction = 0
+if set_direction:
+	leftSide_direction  = 1
+	rightSide_direction = 0
+else:
+	leftSide_direction  = 0
+	rightSide_direction = 1
 
 '''
 change these two variables to reverse the height of the legs.
 '''
-leftSide_height  = 0
-rightSide_height = 1
+if set_direction:
+	leftSide_height  = 0
+	rightSide_height = 1
+else:
+	leftSide_height  = 1
+	rightSide_height = 0
 
 '''
 change this variable to set the range of the height range.
@@ -31,8 +44,12 @@ height_change = 30
 '''
 change these two variables to adjuest the function for observing.
 '''
-Up_Down_direction = 1
-Left_Right_direction = 1
+if set_direction:
+	Up_Down_direction = 1
+	Left_Right_direction = 1
+else:
+	Up_Down_direction = 0
+	Left_Right_direction = 0
 Left_Right_input = 300
 Up_Down_input = 300
 Left_Right_Max = 500
