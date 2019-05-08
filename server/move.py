@@ -128,6 +128,10 @@ def mpu6050Test():
 		print('X=%f,Y=%f,Z=%f'%(accelerometer_data['x'],accelerometer_data['y'],accelerometer_data['x']))
 		time.sleep(0.3)
 
+		
+def init_all():
+	pwm.set_all_pwm(0,300)
+	
 
 def ctrl_range(raw, max_genout, min_genout):
 	if raw > max_genout:
