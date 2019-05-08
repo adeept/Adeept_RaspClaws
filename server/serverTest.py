@@ -295,6 +295,7 @@ def destory():
 if __name__ == '__main__':
     switch.switchSetup()
     switch.set_all_switch_off()
+    move.init_all()
 
     HOST = ''
     PORT = 10223                              #Define port serial 
