@@ -182,9 +182,9 @@ def run():
     info_threading.setDaemon(True)                             #'True' means it is a front thread,it would close when the mainloop() closes
     info_threading.start()                                     #Thread starts
 
-    info_threading=threading.Thread(target=FPV_thread)    #Define a thread for FPV and OpenCV
-    info_threading.setDaemon(True)                        #'True' means it is a front thread,it would close when the mainloop() closes
-    info_threading.start()                                #Thread starts
+    #info_threading=threading.Thread(target=FPV_thread)    #Define a thread for FPV and OpenCV
+    #info_threading.setDaemon(True)                        #'True' means it is a front thread,it would close when the mainloop() closes
+    #info_threading.start()                                #Thread starts
 
     ws_R = 0
     ws_G = 0
