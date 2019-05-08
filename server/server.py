@@ -320,6 +320,7 @@ def destory():
 if __name__ == '__main__':
     switch.switchSetup()
     switch.set_all_switch_off()
+    move.init_all()
 
     HOST = ''
     PORT = 10223                              #Define port serial 
@@ -380,12 +381,12 @@ if __name__ == '__main__':
     except:
         pass
 
-    #try:
-    run()
-    #except:
-    LED.colorWipe(Color(0,0,0))
-    destory()
-    move.clean_all()
-    switch.switch(1,0)
-    switch.switch(2,0)
-    switch.switch(3,0)
+    try:
+        run()
+    except:
+        LED.colorWipe(Color(0,0,0))
+        destory()
+        move.clean_all()
+        switch.switch(1,0)
+        switch.switch(2,0)
+        switch.switch(3,0)
