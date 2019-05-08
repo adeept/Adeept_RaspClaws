@@ -174,13 +174,17 @@ def FPV_thread():
 
 def run():
     global direction_command, turn_command, SmoothMode, steadyMode
-    moving_threading=threading.Thread(target=move_thread)    #Define a thread for FPV and OpenCV
-    moving_threading.setDaemon(True)                             #'True' means it is a front thread,it would close when the mainloop() closes
-    moving_threading.start()                                     #Thread starts
+    moving_threading=threading.Thread(target=move_thread)    #Define a thread for moving
+    moving_threading.setDaemon(True)                         #'True' means it is a front thread,it would close when the mainloop() closes
+    moving_threading.start()                                 #Thread starts
 
-    info_threading=threading.Thread(target=info_send_client)    #Define a thread for FPV and OpenCV
+    info_threading=threading.Thread(target=info_send_client)   #Define a thread for communication
     info_threading.setDaemon(True)                             #'True' means it is a front thread,it would close when the mainloop() closes
     info_threading.start()                                     #Thread starts
+
+    info_threading=threading.Thread(target=FPV_thread)    #Define a thread for FPV and OpenCV
+    info_threading.setDaemon(True)                        #'True' means it is a front thread,it would close when the mainloop() closes
+    info_threading.start()                                #Thread starts
 
     ws_R = 0
     ws_G = 0
