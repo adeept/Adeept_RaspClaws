@@ -57,6 +57,7 @@ Left_Right_Min = 100
 Up_Down_Max = 500
 Up_Down_Min = 270
 look_wiggle = 30
+move_stu = 1
 
 
 '''
