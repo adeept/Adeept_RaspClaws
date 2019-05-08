@@ -954,8 +954,6 @@ def steady():
 		'''
 		right_I_input = ctrl_range((-X_fix_output-Y_fix_output), steady_range_Max, steady_range_Min)
 		right_I(0, 35, right_I_input)
-	except:
-		pass
 
 
 def steadyTest():
