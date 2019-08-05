@@ -62,7 +62,7 @@ for x in range(1,4):
 		break
 
 for x in range(1,4):
-	if os.system("sudo apt-get install python3-smbus") == 0:
+	if os.system("sudo apt-get install -y python3-smbus") == 0:
 		break
 
 for x in range(1,4):
@@ -79,7 +79,7 @@ for x in range(1,4):
 		break
 
 for x in range(1,4):
-	if os.system("sudo pip3 install opencv-contrib-python") == 0:
+	if os.system("sudo apt-get install libopencv-dev python3-opencv") == 0:
 		break
 
 for x in range(1,4):
