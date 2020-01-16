@@ -525,7 +525,7 @@ def move(step_input, speed, command):
 	if step_II > 4:
 		step_II = step_II - 4
 	if speed == 0:
-		speed = 35
+		return
 
 	if command == 'no':
 		right_I(step_I, speed, 0)
@@ -1074,14 +1074,14 @@ if __name__ == '__main__':
 	step = 1
 	move_stu = 1
 	try:
-		'''
+		# '''
 		while 1:
 			move(step, 35, 'no')
 			step += 1
 			if step > 4:
 				step = 1
 			time.sleep(0.08)
-		'''
+		# '''
 		'''
 		while 1:
 			dove(1,-35,0.01,17,'no')
