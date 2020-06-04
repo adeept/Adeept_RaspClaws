@@ -10,6 +10,8 @@ import Adafruit_PCA9685
 from mpu6050 import mpu6050
 import Kalman_filter
 import PID
+import threading
+import RPIservo
 
 '''
 change this variables to 0 to reverse all the servos.
@@ -117,7 +119,7 @@ target_Y = 0
 Set a default pwm value for all servos.
 '''
 for i in range(0,16):
-	exec('pwm%d=300'%i)
+	exec('pwm%d=RPIservo.init_pwm%d'%(i,i))
 
 '''
 Get raw data from mpu6050.
@@ -130,8 +132,28 @@ def mpu6050Test():
 
 		
 def init_all():
-	pwm.set_all_pwm(0,300)
+	pwm.set_pwm(0, 0, pwm0)
+	pwm.set_pwm(1, 0, pwm1)
+	pwm.set_pwm(2, 0, pwm2)
+	pwm.set_pwm(3, 0, pwm3)
+
+	pwm.set_pwm(4, 0, pwm4)
+	pwm.set_pwm(5, 0, pwm5)
+	pwm.set_pwm(6, 0, pwm6)
+	pwm.set_pwm(7, 0, pwm7)
+
+	pwm.set_pwm(8, 0, pwm8)
+	pwm.set_pwm(9, 0, pwm9)
+	pwm.set_pwm(10, 0, pwm10)
+	pwm.set_pwm(11, 0, pwm11)
+
+	pwm.set_pwm(12, 0, pwm12)
+	pwm.set_pwm(13, 0, pwm13)
+	pwm.set_pwm(14, 0, pwm14)
+	pwm.set_pwm(15, 0, pwm15)
 	
+
+init_all()
 
 def ctrl_range(raw, max_genout, min_genout):
 	if raw > max_genout:
@@ -1068,6 +1090,152 @@ def clean_all():
 
 def destroy():
 	clean_all()
+
+
+SmoothMode = 0
+steadyMode = 0
+
+step_set = 1
+speed_set = 100
+DPI = 17
+
+new_frame = 0
+direction_command = 'no'
+turn_command = 'no'
+
+
+def move_thread():
+	global step_set
+	stand_stu = 1
+	if not steadyMode:
+		if direction_command == 'forward' and turn_command == 'no':
+			if SmoothMode:
+				dove(step_set,35,0.001,DPI,'no')
+				step_set += 1
+				if step_set == 5:
+					step_set = 1
+
+			else:
+				move(step_set, 35, 'no')
+				time.sleep(0.1)
+				step_set += 1
+				if step_set == 5:
+					step_set = 1
+
+		elif direction_command == 'backward' and turn_command == 'no':
+			if SmoothMode:
+				dove(step_set,-35,0.001,DPI,'no')
+				step_set += 1
+				if step_set == 5:
+					step_set = 1
+
+			else:
+				move(step_set, -35, 'no')
+				time.sleep(0.1)
+				step_set += 1
+				if step_set == 5:
+					step_set = 1
+
+		else:
+			pass
+
+		if turn_command != 'no':
+			if SmoothMode:
+				dove(step_set,35,0.001,DPI,turn_command)
+				step_set += 1
+				if step_set == 5:
+					step_set = 1
+
+			else:
+				move(step_set, 35, turn_command)
+				time.sleep(0.1)
+				step_set += 1
+				if step_set == 5:
+					step_set = 1
+
+		else:
+			pass
+
+		if turn_command == 'no' and direction_command == 'stand':
+			stand()
+			step_set = 1
+		pass
+	else:
+		steady_X()
+		steady()
+
+
+class RobotM(threading.Thread):
+	def __init__(self, *args, **kwargs):
+		super(RobotM, self).__init__(*args, **kwargs)
+		self.__flag = threading.Event()
+		self.__flag.clear()
+
+	def pause(self):
+		#print('......................pause..........................')
+		self.__flag.clear()
+
+	def resume(self):
+		self.__flag.set()
+
+	def run(self):
+		while 1:
+			self.__flag.wait()
+			move_thread()
+			pass
+
+rm = RobotM()
+rm.start()
+rm.pause()
+
+def commandInput(command_input):
+	global direction_command, turn_command, SmoothMode, steadyMode
+	if 'forward' == command_input:
+		direction_command = 'forward'
+		rm.resume()
+	
+	elif 'backward' == command_input:
+		direction_command = 'backward'
+		rm.resume()
+
+	elif 'stand' in command_input:
+		direction_command = 'stand'
+		rm.pause()
+
+
+	elif 'left' == command_input:
+		turn_command = 'left'
+		rm.resume()
+
+	elif 'right' == command_input:
+		turn_command = 'right'
+		rm.resume()
+
+	elif 'no' in command_input:
+		turn_command = 'no'
+		rm.pause()
+
+	elif 'automaticOff' == command_input:
+		SmoothMode = 0
+		steadyMode = 0
+		rm.pause()
+
+	elif 'automatic' == command_input:
+		rm.resume()
+		SmoothMode = 1
+
+	elif 'KD' == command_input:
+		steadyMode = 1
+		rm.resume()
+
+	elif 'speech' == command_input:
+		steadyMode = 1
+		rm.resume()
+
+	elif 'speechOff' == command_input:
+		SmoothMode = 0
+		steadyMode = 0
+		rm.pause()
 
 
 if __name__ == '__main__':
