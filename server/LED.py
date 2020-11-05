@@ -127,3 +127,16 @@ class LED:
 #led=LED()
 #led.breath(255)
 #led.colorWipe(Color(0,0,0))
+
+if __name__ == '__main__':
+    led = LED()
+    try:  
+        while True:  
+            led.colorWipe(Color(255, 0, 0))  # red
+            time.sleep(1)  
+            led.colorWipe(Color(0, 255, 0))  # green
+            time.sleep(1)  
+            led.colorWipe(Color(0, 0, 255))  # blue
+            time.sleep(1) 
+    except:  
+        led.colorWipe(Color(0,0,0))  # Lights out
