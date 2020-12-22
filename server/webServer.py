@@ -122,10 +122,10 @@ def functionSelect(command_input, response):
 	elif 'trackLineOff' == command_input:
 		flask_app.modeselect('none')
 
-	elif 'speech' == command_input:
+	elif 'police' == command_input:
 		RL.police()
 
-	elif 'speechOff' == command_input:
+	elif 'policeOff' == command_input:
 		RL.pause()
 
 
