@@ -206,10 +206,17 @@ def get_direction():
 
 
 if __name__ == '__main__':
+	# while True:
+	# 	for i in range(0,100):
+	# 		pwm.set_pwm(0, 0, (300+i))
+	# 		time.sleep(0.05)
+	# 	for i in range(0,100):
+	# 		pwm.set_pwm(0, 0, (400-i))
+	# 		time.sleep(0.05)
+
+	channel = 0	# servo port number.
 	while True:
-		for i in range(0,100):
-			pwm.set_pwm(0, 0, (300+i))
-			time.sleep(0.05)
-		for i in range(0,100):
-			pwm.set_pwm(0, 0, (400-i))
-			time.sleep(0.05)
+		pwm.set_pwm(channel, 0, 200)
+		time.sleep(1)
+		pwm.set_pwm(channel, 0, 400)
+		time.sleep(1)
