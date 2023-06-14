@@ -242,7 +242,7 @@ class FPV:
         context = zmq.Context()
         footage_socket = context.socket(zmq.PUB)
         print(IPinver)
-        footage_socket.connect('tcp://%s:5555'%IPinver)
+        footage_socket.bind('tcp://*:5555')
 
         avg = None
         motionCounter = 0
