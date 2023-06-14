@@ -4,8 +4,8 @@
 # Description : client  
 # Website	 : www.adeept.com
 # E-mail	  : support@adeept.com
-# Author	  : William
-# Date		: 2018/08/22
+# Author	  : Devin
+# Date		: 2023/06/14
 
 from socket import *
 import sys
@@ -32,6 +32,8 @@ funcMode= 0
 tcpClicSock = ''
 root = ''
 stat = 0
+ip_adr = ''
+footage_socket = None
 
 Switch_3 = 0
 Switch_2 = 0
@@ -44,10 +46,11 @@ def video_thread():
 	global footage_socket, font, frame_num, fps
 	context = zmq.Context()
 	footage_socket = context.socket(zmq.SUB)
-	footage_socket.bind('tcp://*:5555')
+	footage_socket.connect('tcp://%s:5555'%ip_adr)
 	footage_socket.setsockopt_string(zmq.SUBSCRIBE, np.unicode(''))
 
 	font = cv2.FONT_HERSHEY_SIMPLEX
+	
 
 	frame_num = 0
 	fps = 0
@@ -66,7 +69,11 @@ def opencv_r():
 	global frame_num
 	while True:
 		try:
+			# try:
 			frame = footage_socket.recv_string()
+			# except Exception as e:
+			# 	print(e)
+
 			img = base64.b64decode(frame)
 			npimg = np.frombuffer(img, dtype=np.uint8)
 			source = cv2.imdecode(npimg, 1)
@@ -95,9 +102,9 @@ fps_threading=thread.Thread(target=get_FPS)		 #Define a thread for FPV and OpenC
 fps_threading.setDaemon(True)							 #'True' means it is a front thread,it would close when the mainloop() closes
 fps_threading.start()									 #Thread starts
 
-video_threading=thread.Thread(target=video_thread)		 #Define a thread for FPV and OpenCV
-video_threading.setDaemon(True)							 #'True' means it is a front thread,it would close when the mainloop() closes
-video_threading.start()									 #Thread starts
+# video_threading=thread.Thread(target=video_thread)		 #Define a thread for FPV and OpenCV
+# video_threading.setDaemon(True)							 #'True' means it is a front thread,it would close when the mainloop() closes
+# video_threading.start()									 #Thread starts
 
 ########>>>>>VIDEO<<<<<########
 
@@ -365,7 +372,7 @@ def Info_receive():
 
 
 def socket_connect():	 #Call this function to connect with the server
-	global ADDR,tcpClicSock,BUFSIZ,ip_stu,ipaddr
+	global ADDR,tcpClicSock,BUFSIZ,ip_stu,ipaddr,ip_adr
 	ip_adr=E1.get()	   #Get the IP address from Entry
 
 	if ip_adr == '':	  #If no input IP address in Entry,import a default IP
@@ -403,6 +410,11 @@ def socket_connect():	 #Call this function to connect with the server
 			connection_threading=thread.Thread(target=connection_thread)		 #Define a thread for FPV and OpenCV
 			connection_threading.setDaemon(True)							 #'True' means it is a front thread,it would close when the mainloop() closes
 			connection_threading.start()									 #Thread starts
+			
+			video_threading=thread.Thread(target=video_thread)		 #Define a thread for FPV and OpenCV
+			video_threading.setDaemon(True)							 #'True' means it is a front thread,it would close when the mainloop() closes
+			video_threading.start()									 #Thread starts
+
 
 			info_threading=thread.Thread(target=Info_receive)		 #Define a thread for FPV and OpenCV
 			info_threading.setDaemon(True)							 #'True' means it is a front thread,it would close when the mainloop() closes
