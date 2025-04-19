@@ -1191,10 +1191,6 @@ class RobotM(threading.Thread):
 			move_thread()
 			pass
 
-rm = RobotM()
-rm.start()
-rm.pause()
-
 def commandInput(command_input):
 	global direction_command, turn_command, SmoothMode, steadyMode
 	if 'forward' == command_input and steadyMode == 0:
